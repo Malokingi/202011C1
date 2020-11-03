@@ -1,35 +1,102 @@
 ---
+#### Starting with creation of the Jenkins NAMESPACE
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nov-c1
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: nov-c1
+  
+---
+  
+##### Creating the deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sample-spring-boot
+    namespace: nov-c1
+    name: jenkins
+    labels:
+        app: jenkins
 spec:
-  replicas: 1 # 1 PODs at any given point of time
-  selector:
-    matchLabels:
-      app: sample-spring-boot
-  template:
-    metadata:
-      labels:
-        app: sample-spring-boot
-    spec:
-      containers:
-        - name: springboot-sample
-          image: <your-registry>/<your-image>:<your-tag># Docker container with our node app
-          ports:
-            - containerPort: 8080
+    replicas: 1
+    selector:
+        matchLabels:
+            app: jenkins
+    template:
+        metadata:
+            labels:
+                app: jenkins
+        spec:
+            containers:
+            -   name: jenkins
+                image: malokingi/i_c1jen:latest
+                imagePullPolicy: Always
+                volumeMounts:
+                    - mountPath: /var/run/docker.sock
+                      name: docker-socket
+            volumes:
+            -   name: docker-socket
+                hostPath:
+                    path: /var/run/docker.sock
+            restartPolicy: Always
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: sample-spring-boot-service
-  labels:
-    name: sample-spring-boot
+    name: jenkins-service
+    namespace: nov-c1
 spec:
-  ports:
-    - port: 8080 # The service will publish the application on the default http port(80)
-      targetPort: 8080
-      protocol: TCP
+    type: NodePort
+    selector:
+        app: jenkins
+    ports:
+        - port: 8080
+          name: jenkins
+          targetPort: 8080
+          nodePort: 30000
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: jenkins-discovery
+  namespace: nov-c1
+spec:
   selector:
-    app: sample-spring-boot
-  type: LoadBalancer # Type loadbalancer will use the underlying cloud provider to create an external url for accessing the app
+    app: master
+  ports:
+    - protocol: TCP
+      port: 50000
+      targetPort: 50000
+      name: slaves
+
+---
+  
+##### Creating the volume claim
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-data
+  namespace: nov-c1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

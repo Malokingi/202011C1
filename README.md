@@ -3,21 +3,22 @@
 
 ### Build a Jenkins CI/CD pipeline for a Dockerized Spring/Node/DotNet microservice on a Kubernetes environment on AWS using Jenkins.
 
+First I set this evn var:
+``` bash
+export rgh=https://raw.githubusercontent.com
+```
 I make a Jenkins Folder and `cd` into it and use these to populate it:
 ``` bash
-curl https://raw.githubusercontent.com/revaturelabs/Auto-CI-Server/master/Jenkins/Dockerfile -o Dockerfile
+curl ${rgh}/revaturelabs/Auto-CI-Server/master/Jenkins/Dockerfile -o Dockerfile
 ```
 ``` bash
-curl https://raw.githubusercontent.com/revaturelabs/Auto-CI-Server/master/Jenkins/plugins.txt -o plugins.txt
+curl ${rgh}/revaturelabs/Auto-CI-Server/master/Jenkins/plugins.txt -o plugins.txt
 ```
 ``` bash
-curl https://raw.githubusercontent.com/200803-java-devops/mwg-JeKuDo/master/jenkins.yaml -o jenkins.yaml
+curl ${rgh}/200803-java-devops/mwg-JeKuDo/master/jenkins.yaml -o jenkins.yaml
 ```
 
-I go back to my root folder and run this:
-``` bash
-curl https://raw.githubusercontent.com/Malokingi/sample-spring-boot/main/kubernetes.yml -o k8s.yml
-```
+Then I go through and make changes to get it to fit what I need. 
 
 ### Set up your cloud infrastructure using `awscli`, register a GitHub hook to trigger a Jenkins build, and validate code quality with SonarCloud before publishing a Docker image to DockerHub.
 

@@ -51,7 +51,7 @@ unclassified:
     fingerprintCleanupDisabled: false
     storage: "file"
   gitHubPluginConfig:
-    hookUrl: "http://localhost:8181/github-webhook/"
+    hookUrl: "http://localhost:8080/github-webhook/"
   gitSCM:
     allowSecondFetch: false
     createAccountBasedOnEmail: false
